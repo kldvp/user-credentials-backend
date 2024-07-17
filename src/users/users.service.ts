@@ -1,6 +1,7 @@
 import { 
   Injectable, 
-  UnauthorizedException 
+  HttpStatus,
+  UnauthorizedException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -45,6 +46,7 @@ export class UsersService {
       name: user.name,
     };
     return {
+      code: HttpStatus.OK,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
