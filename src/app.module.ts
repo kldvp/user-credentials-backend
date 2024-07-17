@@ -4,14 +4,22 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersModule } from './users/users.module';
+import { UserService } from './db/user.service';
+import { User, UserSchema } from './schemas/user.schema';
+
 
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGODB_URL)
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(process.env.MONGODB_URL),
+    UsersModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UserService],
 })
 export class AppModule {}
