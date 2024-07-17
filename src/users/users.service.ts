@@ -1,24 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  Injectable, 
+  UnauthorizedException 
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from '../schemas/user.schema';
-import { UserDetails } from '../dto/user-details.dto';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private jwtService: JwtService,
 
-  // async create(createUserDto: UserDetails): Promise<User> {
-  //   const salt = await bcrypt.genSalt();
-  //   const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-
-  //   const createdUser = new this.userModel({
-  //     email: createUserDto.email,
-  //     password: hashedPassword,
-  //   });
-  //   return createdUser.save();
-  // }
+  ) {}
 
   async createUser(email: string, name: string, password: string): Promise<User | undefined> {
     const salt = await bcrypt.genSalt();
@@ -34,5 +31,21 @@ export class UsersService {
 
   async findOne(email: string): Promise<User | undefined> {
     return this.userModel.findOne({ email }).exec();
+  }
+
+  async signIn(email: string, password: string): Promise<any> {
+    const user = await this.findOne(email);
+    if (!user) throw new UnauthorizedException();
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (user && !isValidPassword) {
+      throw new UnauthorizedException();
+    }
+    const payload = {
+      email: user.email,
+      name: user.name,
+    };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

@@ -1,16 +1,19 @@
-import { 
-    Controller, 
-    Post, 
-    Body,
-    HttpException,
-    HttpStatus,
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  HttpCode
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDetails } from '../dto/user-details.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+  ) { }
 
   @Post('signup')
   async register(@Body() body: UserDetails) {
@@ -25,5 +28,13 @@ export class UsersController {
 
     const createdUser = await this.userService.createUser(email, name, password);
     return createdUser;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('signin')
+  async signIn(@Body() body: any) {
+    const { email, password } = body;
+    const createdUser = await this.userService.signIn(email, password);
+    return { accessToken: createdUser };
   }
 }
