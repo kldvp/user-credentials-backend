@@ -38,9 +38,16 @@ export class UsersController {
   @Post('signup')
   async register(@Body() body: UserDetails) {
     const { email, name, password } = body;
+    // client side validations
+    if (!email) {
+      throw new HttpException(
+        'Email is required',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
     if (!isPasswordValid(password)) {
       throw new HttpException(
-        'Password must be 8 characters minimum, with at least one letter, one number, and one special character',
+        'Password is required and must be 8 characters minimum, with at least one letter, one number, and one special character',
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
