@@ -16,7 +16,9 @@ import { User, UserSchema } from './schemas/user.schema';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot(process.env.MONGODB_URL, {
+      dbName: 'UserCredentials'
+    }),
     UsersModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
@@ -28,4 +30,4 @@ import { User, UserSchema } from './schemas/user.schema';
   controllers: [AppController],
   providers: [AppService, UsersService],
 })
-export class AppModule {}
+export class AppModule { }

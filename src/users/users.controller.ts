@@ -1,18 +1,31 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
   HttpStatus,
   HttpCode,
   HttpException,
-  InternalServerErrorException
+  InternalServerErrorException,
+  Inject,
+  Injectable,
+  Scope,
+  UseGuards
 } from '@nestjs/common';
+
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+
 import { UsersService } from './users.service';
+import { AuthGuard } from '../auth/auth.guard';
 import { UserDetails } from '../dto/user-details.dto';
 
+
 @Controller('users')
+@Injectable({ scope: Scope.REQUEST })
 export class UsersController {
   constructor(
+    @Inject(REQUEST) private request: Request,
     private readonly userService: UsersService,
   ) { }
 
@@ -50,5 +63,25 @@ export class UsersController {
     const { email, password } = body;
     const result = await this.userService.signIn(email, password);
     return result;
+  }
+
+
+  /**
+   * Route: User details
+   * - Protected route, only accessed by authorized access token
+   * - Provide user details based on access token
+  */
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  async getAllMyUploadedPictures() {
+    let user = this.request['user'];
+    if (!user) {
+      throw new HttpException(
+        `User data not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    user = user.toJSON();
+    return { data: { name: user.name || 'User', email: user.email }, code: HttpStatus.OK };
   }
 }
