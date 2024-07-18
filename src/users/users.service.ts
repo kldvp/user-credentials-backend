@@ -19,6 +19,8 @@ export class UsersService {
 
   ) {}
 
+
+  // create a new user account
   async createUser(email: string, name: string, password: string): Promise<User | undefined> {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -35,6 +37,7 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  // validate user against email & password
   async signIn(email: string, password: string): Promise<any> {
     const user = await this.findOne(email);
     if (!user) {

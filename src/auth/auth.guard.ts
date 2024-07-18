@@ -15,6 +15,11 @@ export class AuthGuard implements CanActivate {
         private userService: UsersService,
     ) { }
 
+    /**
+     * - Validate user
+     * - Extract JWT token
+     * - Check whether user is registered user or not
+    */
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
@@ -34,6 +39,7 @@ export class AuthGuard implements CanActivate {
         return true;
     }
 
+    // helper function to extract JWT token from request header
     private extractTokenFromHeader(request: Request): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;
