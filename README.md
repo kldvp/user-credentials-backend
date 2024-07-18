@@ -4,6 +4,14 @@ Backend service for User crendentials module
 
 ## Installation
 
+Clone repo by using following command
+
+```
+git clone https://github.com/kldvp/user-credentials-backend.git
+```
+
+Install dependencies by using following command
+
 ```bash
 $ npm install
 ```
