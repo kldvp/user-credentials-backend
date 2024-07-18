@@ -19,6 +19,7 @@ import { Request } from 'express';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { UserDetails } from '../dto/user-details.dto';
+import { isPasswordValid } from '../utils/utils';
 
 
 @Controller('users')
@@ -37,6 +38,12 @@ export class UsersController {
   @Post('signup')
   async register(@Body() body: UserDetails) {
     const { email, name, password } = body;
+    if (!isPasswordValid(password)) {
+      throw new HttpException(
+        'Password must be 8 characters minimum, with at least one letter, one number, and one special character',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
     const isExists = await this.userService.findOne(email);
     if (isExists) {
       throw new HttpException(
