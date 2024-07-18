@@ -1,6 +1,7 @@
 import { 
   Injectable, 
   HttpStatus,
+  HttpException,
   UnauthorizedException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -36,10 +37,18 @@ export class UsersService {
 
   async signIn(email: string, password: string): Promise<any> {
     const user = await this.findOne(email);
-    if (!user) throw new UnauthorizedException();
+    if (!user) {
+      throw new HttpException(
+        `User account not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
     const isValidPassword = await bcrypt.compare(password, user.password);
-    if (user && !isValidPassword) {
-      throw new UnauthorizedException();
+    if (!isValidPassword) {
+      throw new HttpException(
+        `Password is incorrect`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     const payload = {
       email: user.email,
